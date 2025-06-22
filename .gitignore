@@ -1,6 +1,6 @@
 /.venv
 /icons.xcf
 /__pycache__
-/build
-/dist
+/build/
+/dist/
 
