@@ -1,6 +1,31 @@
-/.venv
-/icons.xcf
-/__pycache__
-/build/
-/dist/
 
+# Bytecode
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtualenv
+.venv/
+env/
+ENV/
+
+# PyInstaller build
+dist/
+build/
+*.spec
+
+# VS Code
+.vscode/
+
+# OS/Misc
+.DS_Store
+Thumbs.db
+
+# Settings & Daten
+settings.json
+icons.xcf
+screenshots/
+
+
+# Logs
+*.log
