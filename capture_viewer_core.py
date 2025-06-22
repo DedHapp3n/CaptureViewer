@@ -49,8 +49,9 @@ class CameraController:
         self.cam_index = index
         self.cap = cv2.VideoCapture(index, cv2.CAP_DSHOW)
         if self.cap.isOpened():
-            self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
-            self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+            self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
+            self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
+            self.cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*'MJPG'))
             return True
         return False
 
@@ -61,12 +62,15 @@ class CameraController:
         if not ret:
             return None, None
         rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        now = time.time()
+
         fps = None
-        if self.show_fps and self.last_time:
-            fps = 1 / (now - self.last_time)
-        self.last_time = now
+        if self.show_fps:
+            fps = self.cap.get(cv2.CAP_PROP_FPS)
+            if not fps or fps < 1:
+                fps = "Missing Fps"
+
         return rgb, fps
+
     
     def trigger_flash(self, parent_label):
         flash = QLabel(parent_label.parent())
@@ -83,7 +87,7 @@ class CameraController:
         timestamp = time.strftime("%Y%m%d_%H%M%S")
         filename = os.path.join("screenshots", f"screenshot_{timestamp}.png")
         cv2.imwrite(filename, cv2.cvtColor(frame, cv2.COLOR_RGB2BGR))
-        print(f"📸 Screenshot gespeichert als {filename}")
+        print(f"Screenshot saved as {filename}")
 
 
     def release(self):

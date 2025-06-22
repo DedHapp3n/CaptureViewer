@@ -16,20 +16,20 @@ from capture_viewer_core import CameraController, get_camera_device_list
 class SettingsDialog(QDialog):
     def __init__(self, current_index, show_fps, current_key="F10"):
         super().__init__()
-        self.setWindowTitle("Kamera auswählen")
+        self.setWindowTitle("Select Camera")
 
         self.combo = QComboBox()
         self.populate()
         self.combo.setCurrentIndex(current_index)
 
-        self.fps_checkbox = QCheckBox("FPS anzeigen")
+        self.fps_checkbox = QCheckBox("Toggle FPS")
         self.fps_checkbox.setChecked(show_fps)
 
-        self.key_label = QLabel("Taste für Screenshot (z. B. F10):")
+        self.key_label = QLabel("Shortcut for Screenshot:")
         self.key_input = QLineEdit()
         self.key_input.setText(current_key)
 
-        btn = QPushButton("Übernehmen")
+        btn = QPushButton("Save")
         btn.clicked.connect(self.accept)
 
         layout = QVBoxLayout()
@@ -119,7 +119,7 @@ class CaptureViewer(QWidget):
 
         self.resize(800, 600)
         if self.controller.start_camera(self.controller.cam_index):
-            self.timer.start(30)
+            self.timer.start(10)
 
     def open_settings(self):
         dialog = SettingsDialog(self.controller.cam_index, self.controller.show_fps, self.controller.shortcut_key)
@@ -130,7 +130,8 @@ class CaptureViewer(QWidget):
             self.shortcut.setKey(QKeySequence(self.controller.shortcut_key))
             self.controller.save_settings()
             if self.controller.start_camera(self.controller.cam_index):
-                self.timer.start(30)
+                self.timer.start(10)
+                
 
     def update_frame(self):
         frame, fps = self.controller.get_frame()
@@ -141,10 +142,14 @@ class CaptureViewer(QWidget):
         img = QImage(frame.data, w, h, ch * w, QImage.Format_RGB888)
         self.label.setPixmap(QPixmap.fromImage(img))
 
-        if self.controller.show_fps and fps:
-            self.fps_label.setText(f"{fps:.1f} FPS")
+        if self.controller.show_fps and fps is not None:
+            if isinstance(fps, str):
+                self.fps_label.setText(f"{fps}")
+            else:
+                self.fps_label.setText(f"{fps:.1f} FPS")
         else:
             self.fps_label.setText("")
+
 
     def handle_screenshot_shortcut(self):
         self.controller.save_screenshot()
