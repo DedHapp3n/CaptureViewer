@@ -52,22 +52,28 @@ class CameraController:
             self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
             self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
             self.cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*'MJPG'))
+            self.cap.set(cv2.CAP_PROP_FPS, 60)
             return True
         return False
 
     def get_frame(self):
         if not self.cap or not self.cap.isOpened():
             return None, None
+
         ret, frame = self.cap.read()
-        if not ret:
+        if not ret or frame is None:
             return None, None
+
         rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
         fps = None
         if self.show_fps:
-            fps = self.cap.get(cv2.CAP_PROP_FPS)
-            if not fps or fps < 1:
-                fps = "Missing Fps"
+            now = time.time()
+            if self.last_time:
+                fps = 1 / (now - self.last_time)
+            else:
+                fps = 0
+            self.last_time = now
 
         return rgb, fps
 
